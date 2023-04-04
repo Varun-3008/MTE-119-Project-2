@@ -26,11 +26,11 @@ def check_lengths(l1, l2, l3):
         x2,y2 = x - l3 * np.cos(q3), y - l3 * np.sin(q3)
         if y2 >= 0:
             l12 = np.sqrt(x2**2 + y2**2)
-            angle = np.tan(y2/x2)
+            angle = np.arctan(y2/x2)
             a1 = np.arccos((l1**2 + l12**2 - l2**2)/(2*l1*l12))
             q1 = [angle + a1, angle - a1]
             x1, y1 = [l1 * np.cos(q1[0]), l1 * np.cos(q1[1])], [l1 * np.sin(q1[0]), l1 * np.sin(q1[1])]
-            q2 = [np.tan((y2-y1[0])/(x2-x1[0])), np.tan((y2-y1[1])/(x2-x1[1]))]
+            q2 = [np.arctan((y2-y1[0])/(x2-x1[0])), np.arctan((y2-y1[1])/(x2-x1[1]))]
             
             for i in range(0,2):
                 T = (l1 / 2) * W1 * np.cos(q1[i]) + W2 * (l1*np.cos(q1[i]) + l2/2 * np.cos(q2[i])) + W3 * (l1*np.cos(q1[i]) + l2 * np.cos(q2[i]) + l3/2 * np.cos(q3)) + WL * x
@@ -54,9 +54,9 @@ if __name__ == "__main__":
     min_res = [0,0,0,1000000,0,0,0,0,0,0,0,0,0,0,0,0,0]
     with conc.ThreadPoolExecutor() as executor:
         futures = []
-        for l1 in np.linspace(0.005, 5, num=100):#reduce num for less brute force at first
-            for l2 in np.linspace(0.005, 5, num=100):
-                for l3 in np.linspace(0.005, 0.84852813742, num=100): #0.0848... is max length of l3
+        for l1 in np.linspace(0.005, 5, num=200):#reduce num for less brute force at first
+            for l2 in np.linspace(0.005, 5, num=200):
+                for l3 in np.linspace(0.005, 0.84852813742, num= 100): #0.0848... is max length of l3
                     futures.append(executor.submit(check_lengths, l1, l2, l3))
 
         for future in tqdm(conc.as_completed(futures)): #using tqdm to track progress
