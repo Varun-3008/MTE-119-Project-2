@@ -40,12 +40,14 @@ void check_lengths(double l1, double l2, double l3, std::vector<double> &min_res
             std::vector<double> q1 = {angle + a1, angle - a1};
             std::vector<double> x1 = {l1 * std::cos(q1[0]), l1 * std::cos(q1[1])};
             std::vector<double> y1 = {l1 * std::sin(q1[0]), l1 * std::sin(q1[1])};
-            std::vector<double> q2 = {std::acos((l1 * l1 + l2 * l2 - l12 * l12) / (2 * l1 * l2)) - M_PI + q1[0], std::acos((l1 * l1 + l2 * l2 - l12 * l12) / (2 * l1 * l2)) - M_PI + q1[1]};
+            std::vector<double> q2 = {std::acos((l1 * l1 + l2 * l2 - l12 * l12) / (2 * l1 * l2)) - M_PI + q1[0], M_PI / 2 - (std::acos((l1 * l1 + l2 * l2 - l12 * l12) / (2 * l1 * l2)) - M_PI + q1[0])};
+
             for (int i = 0; i < 2; ++i)
             {
                 if (!intersect(0, x1[i], x2, 0, y1[i], y2, x, y))
                 {
-                    double T = (l1 / 2) * W1 * l1 * std::cos(q1[i]) + W2 * l2 * (l1 * std::cos(q1[i]) + l2 / 2 * std::cos(q2[i])) + W3 * l3 * (l1 * std::cos(q1[i]) + l2 * std::cos(q2[i]) + l3 / 2 * std::cos(q3)) + WL * x;
+                    double T = x1[i] / 2 * W1 * l2 + (x + x2) / 2 * W2 * l1 + (x2 + x1[i]) / 2 * W3 * l3 + WL * x;
+                    // double T = (l1 / 2) * W1 * l1 * std::cos(q1[i]) + W2 * l2 * (l1 * std::cos(q1[i]) + l2 / 2 * std::cos(q2[i])) + W3 * l3 * (l1 * std::cos(q1[i]) + l2 * std::cos(q2[i]) + l3 / 2 * std::cos(q3)) + WL * x;
 
                     if (T < pos[3] && y1[i] >= 0)
                     {
@@ -84,22 +86,20 @@ int main()
 {
     std::vector<double> min_res(16, 1000000);
     min_res[0] = min_res[1] = min_res[2] = 0;
-
-    int i = 0;
-    
-    for (double l1 = 0.005; l1 <= 5; l1 += (7 - 0.005) / 3000)
+    int count = 0;
+    for (double l1 = 0.8; l1 <= 1.1; l1 += (0.3) / 1000)
     {
-        for (double l2 = 0.005; l2 <= 5; l2 += (7 - 0.005) / 3000)
+        for (double l2 = 1.3; l2 <= 1.5; l2 += (0.2) / 1000)
         {
-            for (double l3 = 0.005; l3 <= 0.84852813742; l3 += (0.84852813742 - 0.005) / 300)
+            for (double l3 = 0.45; l3 <= 0.55; l3 += (0.1) / 200)
             {
-                if(i %100000 == 0)
-                {
-                    std::cout<<i<<std::endl;
-                }
-                i++;
                 check_lengths(l1, l2, l3, min_res);
             }
+        }
+        count++;
+        if (count % 10 == 0)
+        {
+            std::cout << count / 10 << "% complete" << std::endl;
         }
     }
 
@@ -107,7 +107,7 @@ int main()
     {
         std::cout << val << "  ";
     }
-    std::cout << std::endl;
+    // std::cout << std::endl;
 
     return 0;
 }
